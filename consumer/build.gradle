@@ -1,0 +1,61 @@
+plugins {
+    id 'java'
+    id 'org.springframework.boot' version '3.4.1'
+    id 'io.spring.dependency-management' version '1.1.7'
+}
+
+group = 'ru.stepanoff'
+version = '0.0.1-SNAPSHOT'
+
+java {
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(17)
+    }
+}
+
+configurations {
+    compileOnly {
+        extendsFrom annotationProcessor
+    }
+}
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    implementation project(':libs')
+
+    // json
+    implementation 'com.fasterxml.jackson.core:jackson-databind:2.15.1'
+
+    // kafka
+    implementation 'org.apache.kafka:kafka-clients:3.4.0'
+
+    // grpc
+    implementation 'org.springframework.boot:spring-boot-starter-webflux'
+    implementation 'net.devh:grpc-server-spring-boot-starter:2.15.0.RELEASE'
+
+    // Prometheus
+    implementation 'io.prometheus:simpleclient:0.16.0'
+    implementation 'io.prometheus:simpleclient_common:0.16.0'
+
+    // Micrometer
+    implementation 'io.micrometer:micrometer-core:1.12.3'
+    implementation 'io.micrometer:micrometer-registry-prometheus:1.12.3'
+
+    // actuator
+    implementation 'org.springframework.boot:spring-boot-starter-actuator'
+    implementation 'de.codecentric:spring-boot-admin-starter-client:3.0.3'
+    implementation 'org.springframework:spring-aspects'
+
+    implementation 'org.springframework.boot:spring-boot-starter'
+    compileOnly 'org.projectlombok:lombok'
+    annotationProcessor 'org.projectlombok:lombok'
+    testImplementation 'org.springframework.boot:spring-boot-starter-test'
+    testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+}
+
+tasks.named('test') {
+    useJUnitPlatform()
+}

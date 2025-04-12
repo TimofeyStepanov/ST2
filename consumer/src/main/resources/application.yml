@@ -1,0 +1,18 @@
+consumer:
+  kafka:
+    bootstrapServices: ${CONSUMER_KAFKA_BOOTSTRAP}
+    groupId: ${CONSUMER_KAFKA_GROUP_ID}
+    autoOffsetReset: ${CONSUMER_KAFKA_AUTO_OFFSET_RESET}
+    inTopic: ${CONSUMER_KAFKA_IN_TOPIC}
+    outTopic: ${CONSUMER_KAFKA_OUT_TOPIC}
+
+    requestTimeoutMs: ${REQUEST_TIMEOUT_MS}
+    batchSize: ${BATCH_SIZE}
+    bufferMemory: ${BUFFER_MEMORY}
+    lingerMs: ${LINGER_MS}
+
+    acks: ${ACKS}
+
+processor:
+  host: ${PROCESSOR_HOST}
+  port: ${PROCESSOR_PORT}

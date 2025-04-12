@@ -1,0 +1,21 @@
+spring:
+  data:
+    mongodb:
+      uri: "mongodb://admin:password@localhost:27017/mydatabase?authSource=admin"
+
+manager:
+  kafka:
+    bootstrapServices: "localhost:9093"
+    groupId: ""
+    autoOffsetReset: "latest"
+    consumerInTopic: "1"
+    processorInTopic: "2"
+    producerInTopic: "3"
+    consumerOutTopic: "4"
+    processorOutTopic: "5"
+    producerOutTopic: "6"
+    acks: "all"
+
+processor:
+  db:
+    dbName: "my_database"

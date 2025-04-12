@@ -1,0 +1,13 @@
+producer:
+  kafka:
+    bootstrapServices: localhost:9093
+    groupId: a
+    autoOffsetReset: latest
+    inTopic: in
+    outTopic: out
+
+    requestTimeoutMs: 30000
+    batchSize: 16384
+    bufferMemory: 33554432
+    lingerMs: 30000
+    acks: all

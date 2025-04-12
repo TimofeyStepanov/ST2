@@ -1,0 +1,226 @@
+version: "3.9"
+
+services:
+  ch1:
+    image: yandex/clickhouse-server
+    container_name: ch1
+    volumes:
+      - ./docker/clickhouse/config.xml:/etc/clickhouse-server/config.d/local.xml
+      - ./docker/clickhouse/macros1.xml:/etc/clickhouse-server/config.d/macros.xml
+    ports:
+      - "8123:8123"
+
+  ch2:
+    image: yandex/clickhouse-server
+    container_name: ch2
+    volumes:
+      - ./docker/clickhouse/config.xml:/etc/clickhouse-server/config.d/local.xml
+      - ./docker/clickhouse/macros2.xml:/etc/clickhouse-server/config.d/macros.xml
+    ports:
+      - "8124:8123"
+
+  ch3:
+    image: yandex/clickhouse-server
+    container_name: ch3
+    volumes:
+      - ./docker/clickhouse/config.xml:/etc/clickhouse-server/config.d/local.xml
+      - ./docker/clickhouse/macros3.xml:/etc/clickhouse-server/config.d/macros.xml
+    ports:
+      - "8125:8123"
+
+  ch4:
+    image: yandex/clickhouse-server
+    container_name: ch4
+    volumes:
+      - ./docker/clickhouse/config.xml:/etc/clickhouse-server/config.d/local.xml
+      - ./docker/clickhouse/macros4.xml:/etc/clickhouse-server/config.d/macros.xml
+    ports:
+      - "8126:8123"
+
+  chproxy:
+    image: tacyuuhon/clickhouse-chproxy
+    container_name: chproxy
+    ports:
+      - '9090:9090'
+    environment:
+      - hack_me_please=true
+    volumes:
+      - ./docker/ch-proxy/config.yml:/opt/config.yml
+    depends_on:
+      - ch1
+      - ch2
+      - ch3
+      - ch4
+
+  mongodb:
+    image: mongo:latest
+    container_name: mongodb
+    restart: always
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: admin
+      MONGO_INITDB_ROOT_PASSWORD: password
+      MONGO_INITDB_DATABASE: mydatabase
+    ports:
+      - "27017:27017"
+
+  zookeeper:
+    image: docker.io/bitnami/zookeeper:3.8
+    container_name: zookeeper
+    ports:
+      - "2181:2181"
+    environment:
+      - ALLOW_ANONYMOUS_LOGIN=yes
+
+  kafka:
+    image: docker.io/bitnami/kafka:3.3.1-debian-11-r38
+    container_name: kafka
+    ports:
+      - "9092:9092"
+      - "9093:9093"
+    environment:
+      - KAFKA_CFG_ZOOKEEPER_CONNECT=zookeeper:2181
+      - ALLOW_PLAINTEXT_LISTENER=yes
+      - KAFKA_CFG_LISTENER_SECURITY_PROTOCOL_MAP=CLIENT:PLAINTEXT,EXTERNAL:PLAINTEXT
+      - KAFKA_CFG_LISTENERS=CLIENT://:9092,EXTERNAL://:9093
+      - KAFKA_CFG_ADVERTISED_LISTENERS=CLIENT://kafka:9092,EXTERNAL://localhost:9093
+      - KAFKA_CFG_INTER_BROKER_LISTENER_NAME=CLIENT
+    depends_on:
+      - zookeeper
+
+  prometheus:
+    image: prom/prometheus
+    container_name: prometheus
+    ports:
+      - "9089:9090"
+    volumes:
+      - ./docker/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
+
+  grafana:
+    image: grafana/grafana
+    container_name: grafana
+    ports:
+      - "3000:3000"
+    environment:
+      - GF_SECURITY_ADMIN_USER=admin
+      - GF_SECURITY_ADMIN_PASSWORD=admin
+    volumes:
+      - ./docker/grafana-storage:/var/lib/grafana
+
+  keycloak:
+    image: quay.io/keycloak/keycloak:24.0.1
+    container_name: keycloak
+    environment:
+      DB_VENDOR: postgres
+      DB_ADDR: postgres
+      DB_DATABASE: keycloak
+      DB_USER: keycloak
+      DB_PASSWORD: password
+      KEYCLOAK_ADMIN: admin
+      KEYCLOAK_ADMIN_PASSWORD: admin
+    ports:
+      - "8080:8080"
+    volumes:
+      - ./docker/keycloak_data:/opt/keycloak/data/h2
+    command: start-dev
+
+  redis-node1:
+    image: redis:latest
+    container_name: redis-node1
+    ports:
+      - "6380:6379"
+    command: redis-server --cluster-enabled yes --cluster-config-file nodes-node-1.conf --cluster-node-timeout 5000 --appendonly yes --bind 0.0.0.0
+
+  redis-node2:
+    image: redis:latest
+    container_name: redis-node2
+    ports:
+      - "6381:6379"
+    command: redis-server --cluster-enabled yes --cluster-config-file nodes-node-1.conf --cluster-node-timeout 5000 --appendonly yes --bind 0.0.0.0
+
+  redis-node3:
+    image: redis:latest
+    container_name: redis-node3
+    ports:
+      - "6382:6379"
+    command: redis-server --cluster-enabled yes --cluster-config-file nodes-node-1.conf --cluster-node-timeout 5000 --appendonly yes --bind 0.0.0.0
+
+  #  docker exec -it redis-node1 redis-cli -c -p 6379
+  redis-cluster-creator:
+    image: redis:latest
+    container_name: redis-cluster-creator
+    ports:
+      - "6999:6379"
+    command: redis-cli --cluster create redis-node1:6379 redis-node2:6379 redis-node3:6379 --cluster-replicas 0 --cluster-yes
+    depends_on:
+      - redis-node1
+      - redis-node2
+      - redis-node3
+
+  producer:
+    build:
+      context: .
+      target: producer
+    image: producer
+    env_file: producer_docker.env
+    container_name: producer
+    ports:
+      - "8084:8084"
+      - "9084:9084"
+    restart: always
+    depends_on:
+      - kafka
+    deploy:
+      replicas: 2
+
+  processor:
+    build:
+      context: .
+      target: processor
+    image: processor
+    env_file: processor_docker.env
+    container_name: processor
+    ports:
+      - "8083:8083"
+      - "9083:9083"
+    restart: always
+    depends_on:
+      - producer
+      - redis-node1
+      - redis-node2
+      - redis-node3
+      - chproxy
+      - kafka
+    deploy:
+      replicas: 3
+
+  consumer:
+    build:
+      context: .
+      target: consumer
+    image: consumer
+    env_file: consumer_docker.env
+    container_name: consumer
+    ports:
+      - "8082:8082"
+      - "9082:9082"
+    restart: always
+    depends_on:
+      - processor
+      - kafka
+    deploy:
+      replicas: 2
+
+  manager:
+    build:
+      context: .
+      target: manager
+    image: manager
+    env_file: manager_docker.env
+    container_name: manager
+    ports:
+      - "8081:8081"
+    restart: always
+    depends_on:
+      - mongodb
+      - keycloak
+      - kafka

@@ -1,0 +1,21 @@
+syntax = "proto3";
+import "google/protobuf/empty.proto";
+option java_multiple_files = true;
+option java_package = "ru.stepanoff.grpc.producer";
+option java_outer_classname = "ProducerProto";
+
+message ProducerDTO {
+  repeated string messagesForUser = 1;
+}
+
+//message ProducerResponse {
+//
+//}
+
+message EmptyProducerRequest {}
+message EmptyProducerResponse {}
+
+service ProducerService {
+  rpc sendToUser(ProducerDTO) returns (EmptyProducerResponse);
+  rpc echo(EmptyProducerRequest) returns (EmptyProducerResponse);
+}

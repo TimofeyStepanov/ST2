@@ -1,0 +1,7 @@
+<yandex>
+    <macros replace="replace">
+        <shard>02</shard>
+        <replica>ch4</replica>
+        <cluster>replicated</cluster>
+    </macros>
+</yandex>

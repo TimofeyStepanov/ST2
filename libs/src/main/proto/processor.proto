@@ -1,0 +1,18 @@
+syntax = "proto3";
+import "google/protobuf/empty.proto";
+option java_multiple_files = true;
+option java_package = "ru.stepanoff.grpc.processor";
+option java_outer_classname = "ProcessorProto";
+
+message ProcessorDTO {
+  string topicAlias = 1;
+  map<string, string> fieldNameAndItsValue = 2;
+}
+
+message EmptyProcessorRequest{}
+message EmptyProcessorResponse{}
+
+service ProcessorService {
+  rpc sendToProducer(ProcessorDTO) returns (EmptyProcessorResponse);
+  rpc echo(EmptyProcessorRequest) returns (EmptyProcessorResponse);
+}

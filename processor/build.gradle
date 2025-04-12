@@ -1,0 +1,69 @@
+plugins {
+    id 'java'
+    id 'org.springframework.boot' version '3.4.1'
+    id 'io.spring.dependency-management' version '1.1.7'
+}
+
+group = 'ru.stepanoff'
+version = '0.0.1-SNAPSHOT'
+
+java {
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(17)
+    }
+}
+
+configurations {
+    compileOnly {
+        extendsFrom annotationProcessor
+    }
+}
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    implementation project(':libs')
+
+    // prometheus
+    implementation group: 'io.micrometer', name: 'micrometer-registry-prometheus', version: '1.14.3'
+
+    // actuator
+    implementation 'org.springframework.boot:spring-boot-starter-actuator'
+    implementation 'de.codecentric:spring-boot-admin-starter-client:3.0.3'
+    implementation 'org.springframework:spring-aspects'
+
+    // kafka
+    implementation 'org.apache.kafka:kafka-clients:3.4.0'
+
+    // grpc
+    implementation 'net.devh:grpc-server-spring-boot-starter:2.15.0.RELEASE'
+
+    // redis
+    implementation 'org.springframework.boot:spring-boot-starter-data-redis:3.4.1'
+
+    // db
+    implementation group: 'org.springframework.boot', name: 'spring-boot-starter-jdbc', version: '3.4.1'
+    implementation group: 'com.clickhouse', name: 'clickhouse-jdbc', version: '0.7.2'
+    implementation 'com.zaxxer:HikariCP:5.0.1'
+    implementation 'org.jooq:jooq:3.18.0'
+
+    implementation 'org.springframework.boot:spring-boot-starter-webflux'
+    compileOnly 'org.projectlombok:lombok'
+    annotationProcessor 'org.projectlombok:lombok'
+
+    // test
+    testImplementation 'org.testcontainers:testcontainers:1.17.6'
+    testImplementation "org.testcontainers:junit-jupiter:1.17.6"
+    testImplementation 'com.redis:testcontainers-redis:2.2.2'
+    testImplementation 'org.testcontainers:clickhouse:1.20.0'
+
+    testImplementation 'org.springframework.boot:spring-boot-starter-test'
+    testImplementation 'io.projectreactor:reactor-test'
+    testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+}
+
+tasks.named('test') {
+    useJUnitPlatform()
+}

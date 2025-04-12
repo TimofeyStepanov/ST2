@@ -1,0 +1,13 @@
+producer:
+  kafka:
+    bootstrapServices: ${PRODUCER_KAFKA_BOOTSTRAP}
+    groupId: ${PRODUCER_KAFKA_GROUP_ID}
+    autoOffsetReset: ${PRODUCER_KAFKA_AUTO_OFFSET_RESET}
+    inTopic: ${PRODUCER_KAFKA_IN_TOPIC}
+    outTopic: ${PRODUCER_KAFKA_OUT_TOPIC}
+
+    requestTimeoutMs: ${REQUEST_TIMEOUT_MS}
+    batchSize: ${BATCH_SIZE}
+    bufferMemory: ${BUFFER_MEMORY}
+    lingerMs: ${LINGER_MS}
+    acks: ${ACKS}

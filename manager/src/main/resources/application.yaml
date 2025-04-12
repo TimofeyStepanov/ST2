@@ -1,0 +1,31 @@
+spring:
+  data:
+    mongodb:
+      uri: ${MONGO_URL}
+
+manager:
+  kafka:
+    bootstrapServices: ${KAFKA_URL}
+    groupId: ${KAFKA_GROUP_ID}
+    autoOffsetReset: ${KAFKA_AUTO_OFFSET_RESET}
+
+    consumerInTopic: ${KAFKA_CONSUMER_IN_TOPIC}
+    processorInTopic: ${KAFKA_PROCESSOR_IN_TOPIC}
+    producerInTopic: ${KAFKA_PRODUCER_IN_TOPIC}
+
+    consumerOutTopic: ${KAFKA_CONSUMER_OUT_TOPIC}
+    processorOutTopic: ${KAFKA_PROCESSOR_OUT_TOPIC}
+    producerOutTopic: ${KAFKA_PRODUCER_OUT_TOPIC}
+
+    acks: ${ACKS}
+
+processor:
+  db:
+    dbName: ${DB_NAME}
+
+#keycloak:
+#  auth-server-url: ${KEYCLOAK_URL}
+#  realm: ${KEYCLOAK_REALM}
+#  resource: ${KEYCLOAK_RESOURCE}
+#  public-client: ${KEYCLOAK_PUBLIC_CLIENT}
+#

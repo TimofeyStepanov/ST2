@@ -1,0 +1,37 @@
+processor:
+  kafka:
+    bootstrapServices: ${PROCESSOR_KAFKA_BOOTSTRAP}
+    groupId: ${PROCESSOR_KAFKA_GROUP_ID}
+    autoOffsetReset: ${PROCESSOR_KAFKA_AUTO_OFFSET_RESET}
+    inTopic: ${PROCESSOR_KAFKA_IN_TOPIC}
+    outTopic: ${PROCESSOR_KAFKA_OUT_TOPIC}
+
+    requestTimeoutMs: ${REQUEST_TIMEOUT_MS}
+    batchSize: ${BATCH_SIZE}
+    bufferMemory: ${BUFFER_MEMORY}
+    lingerMs: ${LINGER_MS}
+    acks: ${ACKS}
+
+  db:
+    url: ${STATE_DB_URL}
+    driverName: ${STATE_DB_DRIVER_NAME}
+#    shardName: ${STATE_DB_SHARD_NAME}
+
+producer:
+  host: ${PRODUCER_HOST}
+  port: ${PRODUCER_PORT}
+
+
+spring:
+  data:
+    redis:
+      cluster:
+        nodes: ${SPRING_DATA_REDIS_CLUSTER_NODES}
+#spring:
+#  data:
+#    redis:
+#      cluster:
+#        nodes:
+#          - localhost:6381
+#          - localhost:6382
+#          - localhost:6383
